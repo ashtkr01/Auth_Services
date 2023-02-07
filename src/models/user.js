@@ -38,6 +38,7 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   User.beforeCreate((user) => {
+    //It is a Syncronous Tasks:
     const encryptedPassword = bcrypt.hashSync(user.password , SALT);
     user.password = encryptedPassword;
   });
