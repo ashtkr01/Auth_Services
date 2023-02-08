@@ -20,6 +20,26 @@ class UserService{
             throw error;
         }
     }
+    //Sign in:
+    async signIn(email , plainPassword){
+        try {
+            //Step-1:
+            const user = await this.userRepository.getByEmail(email);
+            //Step 2:
+            const passwordMatch = this.checkPassword(plainPassword , user.password);
+
+            if(!passwordMatch){
+                console.log("Password doesn't match");
+                throw {error : 'Incorrect Password'};
+            }
+            //Step 4: If password matches then we have to create the token:
+            const newJWT = this.createToken({email : user.email , password : user.password});
+            return newJWT;
+        } catch (error) {
+            console.log("Something went wrong in SignIn");
+            throw error;
+        }
+    }
     //Generate Tokens:
     createToken(user) {
         try {
@@ -42,7 +62,7 @@ class UserService{
         }
     }
 
-    //Check Password:
+    //Check Password: 
     checkPassword(userInputPlainPassword , encryptedPassword){
         try {
             return bcrypt.compareSync(userInputPlainPassword , encryptedPassword);
