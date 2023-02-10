@@ -16,7 +16,7 @@ class UserService{
             const user = await this.userRepository.create(data);
             return user;
         } catch (error) {
-            console.log("Somethong went wrong in service repository");
+            console.log("Somethong went wrong in service layer");
             throw error;
         }
     }
@@ -32,11 +32,31 @@ class UserService{
                 console.log("Password doesn't match");
                 throw {error : 'Incorrect Password'};
             }
-            //Step 4: If password matches then we have to create the token:
-            const newJWT = this.createToken({email : user.email , password : user.password});
+            //Step 4: If password matches then we have to create the token: with given property
+            const newJWT = this.createToken({email : user.email , password : user.password , id : user.id});
             return newJWT;
         } catch (error) {
             console.log("Something went wrong in SignIn");
+            throw error;
+        }
+    }
+    //IsAuthenticated:
+    async isAuthenticated(token){
+        try {
+            const response = this.verifyToken(token);
+            if(!response){
+                throw {error: "Invalid Token"};
+            }
+            const user = await this.userRepository.getById(response.id);
+            // const user = await this.userRepository.getByEmail(response.email);
+            console.log(response);
+            console.log(response.id);
+            if(!user){
+                throw {error: 'No user with corresponding token exists'};
+            }
+            return user.id;
+        } catch (error) {
+            console.log("Something went wrong in isAuthenticated Service");
             throw error;
         }
     }
