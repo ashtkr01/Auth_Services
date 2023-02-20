@@ -6,6 +6,9 @@ const { JWT_KEY } = require('../config/serverConfig');
 
 const UserRepository = require('../repository/user-repository');
 
+//REquire 
+const AppErrors = require('../utils/error-handler');
+
 class UserService{
     constructor(){
         this.userRepository = new UserRepository();
@@ -21,7 +24,12 @@ class UserService{
                 throw error;
             }
             console.log("Somethong went wrong in service layer");
-            throw error;
+            throw new AppErrors(
+                'Server Error',
+                'Something went wrong in Service Layer',
+                'Logical Issue Found',
+                500
+            );
         }
     }
     //Sign in:
@@ -40,6 +48,9 @@ class UserService{
             const newJWT = this.createToken({email : user.email , password : user.password , id : user.id});
             return newJWT;
         } catch (error) {
+            if(error.name == 'AttributeNotFound'){
+                throw error;
+            }
             console.log("Something went wrong in SignIn");
             throw error;
         }
